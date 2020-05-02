@@ -34,7 +34,9 @@ class GeoJSONSource {
         return;
       }
 
-      const geoJSON = {type: "FeatureCollection", features: JSON.parse(body).data.bikeRentalStations.map(station => ({
+      const geoJSON = {type: "FeatureCollection", features: JSON.parse(body).data.bikeRentalStations.filter(station => {
+        return station.lat != 0 && station.lon != 0;
+      }).map(station => ({
         type: "Feature",
         geometry: {type: "Point", coordinates: [station.lon, station.lat]},
         properties: {
@@ -46,7 +48,7 @@ class GeoJSONSource {
 
       this.tileIndex = geojsonVt(geoJSON, {
         maxZoom: 20,
-        buffer: 256
+        buffer: 1024
       }); //TODO: this should be configurable
       callback(null, this)
     }.bind(this));
